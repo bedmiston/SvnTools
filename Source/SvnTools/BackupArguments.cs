@@ -30,10 +30,28 @@ namespace SvnTools
            HelpText = "Compress backup folders.")]
         public bool Compress;
 
-        /// <summary>
-        /// Repository root folder.
-        /// </summary>
-        [Argument(ArgumentType.AtMostOnce | ArgumentType.Required,
+      /// <summary>
+      /// Repository root folder.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+         ShortName = "t",
+         LongName = "threads",
+         HelpText = "Number of simultaneous threads.")]
+      public int Threads = 3;
+
+      /// <summary>
+      /// Repository root folder.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+         ShortName = "s",
+         LongName = "skip",
+         HelpText = "Comma delimited list of repositories to skip in the backup")]
+      public string SkipRepositories = string.Empty;
+
+      /// <summary>
+      /// Repository root folder.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce | ArgumentType.Required,
            ShortName = "r",
            LongName = "repository",
            HelpText = "Repository root folder.")]

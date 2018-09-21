@@ -43,7 +43,7 @@ namespace SvnTools
          else
          {
             ParallelOptions po = new ParallelOptions();
-            po.MaxDegreeOfParallelism = 3;
+            po.MaxDegreeOfParallelism = args.Threads;
 
             Parallel.ForEach(repoRoot.GetDirectories(), po, (repo) =>
             {
@@ -54,6 +54,7 @@ namespace SvnTools
                catch (Exception ex)
                {
                   _log.Error("An exception occurred while backing up repos", ex);
+                  throw;
                }
             });
          }
@@ -64,11 +65,20 @@ namespace SvnTools
       {
          try
          {
-            
             string revString = GetRevision(args, repository);
 
             if (string.IsNullOrEmpty(revString))
                return; // couldn't find repo
+
+            var skipRepositories = args.SkipRepositories.Split(',');
+            foreach (var skipRepository in skipRepositories)
+            {
+               if (string.Compare(skipRepository, repository.Name, true) == 0)
+               {
+                  _log.InfoFormat("Skipping '{0}' because it is in the list of repositories to skip.", repository.Name);
+                  return;
+               }
+            }
 
             string backupRepoPath = Path.Combine(backupRoot.FullName, repository.Name);
             string backupRevPath = Path.Combine(backupRepoPath, revString);
