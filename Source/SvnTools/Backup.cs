@@ -26,6 +26,8 @@ namespace SvnTools
       /// <param name="args">The arguments used in the backup.</param>
       public static void Run(BackupArguments args)
       {
+         var stopwatch = Stopwatch.StartNew();
+         _log.InfoFormat("Backup starting.");
          var repoRoot = new DirectoryInfo(args.RepositoryRoot);
          if (!repoRoot.Exists)
             throw new InvalidOperationException(string.Format(
@@ -58,6 +60,8 @@ namespace SvnTools
                }
             });
          }
+
+         _log.InfoFormat("Backup complete. Duration: {0}", stopwatch.Elapsed);
       }
 
       
@@ -93,6 +97,11 @@ namespace SvnTools
                return; // this rev is already backed up
             }
 
+            if (args.Verify)
+            {
+               VerifyRepository(args, repository);
+            }
+
             Stopwatch stopwatch = Stopwatch.StartNew();
             // hotcopy
             _log.InfoFormat("Backing up '{0}' from '{1}'.", revString, repository.Name);
@@ -109,6 +118,28 @@ namespace SvnTools
          catch (Exception ex)
          {
             _log.Error(ex.Message, ex);
+            throw;
+         }
+      }
+
+      private static void VerifyRepository(BackupArguments args, DirectoryInfo repo)
+      {
+         var stopwatch = Stopwatch.StartNew();
+         using (var verify = new Verify())
+         {
+            if (!string.IsNullOrEmpty(args.SubversionPath))
+               verify.ToolPath = args.SubversionPath;
+
+            verify.RepositoryPath = repo.FullName;
+            verify.Execute();
+
+            if (!string.IsNullOrEmpty(verify.StandardError))
+            {
+               _log.Info(verify.StandardError);
+               throw new Exception(string.Format("The repository {0} failed verification. Error: {1}", repo.Name, verify.StandardError));
+            }
+
+            _log.InfoFormat("Verify of {0} succeeded. Duration: {1}", repo.FullName, stopwatch.Elapsed);
          }
       }
 
@@ -116,8 +147,8 @@ namespace SvnTools
       {
          using (var hotCopy = new HotCopy())
          {
-            if (!string.IsNullOrEmpty(args.SubverisonPath))
-               hotCopy.ToolPath = args.SubverisonPath;
+            if (!string.IsNullOrEmpty(args.SubversionPath))
+               hotCopy.ToolPath = args.SubversionPath;
 
             hotCopy.BackupPath = backupRevPath;
             hotCopy.RepositoryPath = repo.FullName;
@@ -139,8 +170,8 @@ namespace SvnTools
          using (var look = new SvnLook(SvnLook.Commands.Youngest))
          {
             look.RepositoryPath = repo.FullName;
-            if (!string.IsNullOrEmpty(args.SubverisonPath))
-               look.ToolPath = args.SubverisonPath;
+            if (!string.IsNullOrEmpty(args.SubversionPath))
+               look.ToolPath = args.SubversionPath;
 
             look.Execute();
             if (!string.IsNullOrEmpty(look.StandardError))

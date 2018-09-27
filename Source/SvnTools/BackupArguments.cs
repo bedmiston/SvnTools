@@ -7,28 +7,37 @@ using SvnTools.CommandLine;
 
 namespace SvnTools
 {
-    /// <summary>
-    /// A class representing the command line arguments.
-    /// </summary>
-    public class BackupArguments
-    {
-        /// <summary>
-        /// The number of backups to keep. Default 10.
-        /// </summary>
-        [Argument(ArgumentType.AtMostOnce,
-            ShortName = "n",
-            LongName = "history",
-            HelpText = "Number of backups to keep. Default 10.")]
-        public int History = 10;
+   /// <summary>
+   /// A class representing the command line arguments.
+   /// </summary>
+   public class BackupArguments
+   {
+      /// <summary>
+      /// The number of backups to keep. Default 10.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+          ShortName = "n",
+          LongName = "history",
+          HelpText = "Number of backups to keep. Default 10.")]
+      public int History = 10;
 
-        /// <summary>
-        /// Compress backup folders.
-        /// </summary>
-        [Argument(ArgumentType.AtMostOnce,
-           ShortName = "c",
-           LongName = "compress",
-           HelpText = "Compress backup folders.")]
-        public bool Compress;
+      /// <summary>
+      /// Compress backup folders.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+         ShortName = "c",
+         LongName = "compress",
+         HelpText = "Compress backup folders.")]
+      public bool Compress;
+
+      /// <summary>
+      /// Compress backup folders.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+         ShortName = "v",
+         LongName = "verify",
+         HelpText = "Verify repository before backing it up.")]
+      public bool Verify;
 
       /// <summary>
       /// Repository root folder.
@@ -55,25 +64,25 @@ namespace SvnTools
            ShortName = "r",
            LongName = "repository",
            HelpText = "Repository root folder.")]
-        public string RepositoryRoot;
+      public string RepositoryRoot;
 
-        /// <summary>
-        /// Backup root folder.
-        /// </summary>
-        [Argument(ArgumentType.AtMostOnce | ArgumentType.Required,
-           ShortName = "b",
-           LongName = "backup",
-           HelpText = "Backup root folder.")]
-        public string BackupRoot;
+      /// <summary>
+      /// Backup root folder.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce | ArgumentType.Required,
+         ShortName = "b",
+         LongName = "backup",
+         HelpText = "Backup root folder.")]
+      public string BackupRoot;
 
-        /// <summary>
-        /// Backup root folder.
-        /// </summary>
-        [Argument(ArgumentType.AtMostOnce,
-           LongName = "svn",
-           HelpText = "Path to subversion bin folder.")]
-        public string SubverisonPath;
+      /// <summary>
+      /// Backup root folder.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce,
+         LongName = "svn",
+         HelpText = "Path to subversion bin folder.")]
+      public string SubversionPath;
 
 
-    }
+   }
 }
