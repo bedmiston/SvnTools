@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -44,6 +45,7 @@ namespace SvnTools
          // next try as parent folder for repositories
          else
          {
+            var exceptions = new ConcurrentQueue<Exception>();
             ParallelOptions po = new ParallelOptions();
             po.MaxDegreeOfParallelism = args.Threads;
 
@@ -55,10 +57,13 @@ namespace SvnTools
                }
                catch (Exception ex)
                {
-                  _log.Error("An exception occurred while backing up repos", ex);
-                  throw;
+                  exceptions.Enqueue(ex);
+                  _log.ErrorFormat("An execption occurred backing up {0}", repo.Name);
                }
             });
+
+            // Throw the exceptions here after the loop completes.
+            if (exceptions.Count > 0) throw new AggregateException(exceptions);
          }
 
          _log.InfoFormat("Backup complete. Duration: {0}", stopwatch.Elapsed);
@@ -133,10 +138,9 @@ namespace SvnTools
             verify.RepositoryPath = repo.FullName;
             verify.Execute();
 
-            if (!string.IsNullOrEmpty(verify.StandardError))
+            if (verify.ExitCode != 0)
             {
-               _log.Info(verify.StandardError);
-               throw new Exception(string.Format("The repository {0} failed verification. Error: {1}", repo.Name, verify.StandardError));
+               throw new Exception(string.Format("The repository {0} failed verification. ExitCode: {1}, Error: {2}", repo.Name, verify.ExitCode, verify.StandardError));
             }
 
             _log.InfoFormat("Verify of {0} succeeded. Duration: {1}", repo.FullName, stopwatch.Elapsed);
