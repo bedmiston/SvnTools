@@ -140,7 +140,7 @@ namespace SvnTools
 
             if (verify.ExitCode != 0)
             {
-               throw new Exception(string.Format("The repository {0} failed verification. ExitCode: {1}, Error: {2}", repo.Name, verify.ExitCode, verify.StandardError));
+               throw new Exception(string.Format("The repository {0} failed verification. ExitCode: {1}, Error: {2}", repo.Name, verify.ExitCode, verify.StandardError.Substring(Math.Max(0, verify.StandardError.Length - 256))));
             }
 
             _log.InfoFormat("Verify of {0} succeeded. Duration: {1}", repo.FullName, stopwatch.Elapsed);
